@@ -48,28 +48,40 @@ namespace MusicCacheParser
         private delegate void addToList(string text);
         private addToList methodAddToList;
         private string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
-        private string outputPath = "Z:\\自动导出\\";
+        //private string outputPath = "Z:\\自动导出\\";
         private string neteaseCachePath = @"C:\Users\xjbos\AppData\Local\Netease\CloudMusic\Cache\Cache";
-        public string OutputPath { get => outputPath; set => outputPath = value; }
+        //public string OutputPath { get => outputPath; set => outputPath = value; }
         public string NeteaseCachePath { get => neteaseCachePath; set => neteaseCachePath = value; }
         private FileSystemWatcher neteaseFSW=new FileSystemWatcher();
         private void init()
         {
             config = form1.Config;
-            methodAddToList = t=>
+            NeteaseCachePath = System.Environment.ExpandEnvironmentVariables(config.NeteaseMusic.CachePath+"\\Cache");
+            methodAddToList = t =>
             {
                 form1.ListBox1.Items.Add(t);
             };
+            tmpPath = config.CustomTmpPath != "" ? tmpPath : System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
             Directory.CreateDirectory(tmpPath);
-            startAutoParser();
+            if (config.NeteaseMusic.AutoParse) {
+                startAutoParser_netease();
+            }
             
         }
-        public void startAutoParser()
+        public void end()
+        {
+            neteaseFSW.EnableRaisingEvents = false;
+            neteaseFSW.Dispose();
+        }
+        ~MusicParser()
+        {
+        }
+        public void startAutoParser_netease()
         {
             neteaseFSW.BeginInit();
             neteaseFSW.Filter = "*.uc";
             neteaseFSW.NotifyFilter = NotifyFilters.FileName;
-            neteaseFSW.Path = neteaseCachePath;
+            neteaseFSW.Path = NeteaseCachePath;
             neteaseFSW.Created += new FileSystemEventHandler(autoParseNetease);
             neteaseFSW.EnableRaisingEvents = true;
             neteaseFSW.EndInit();
@@ -239,14 +251,27 @@ namespace MusicCacheParser
                     }
                     break;
             }
-            if(format != MusicFileFormat.FLAC)
-            {
-                addToFList("Format " + format.ToString() + " is disabled to output.");
-                return -2;
-            }
             if (format == MusicFileFormat.UNKONWN)
             {
                 return -1;
+            }
+            int iii = 0;
+            int ii2 = 0;
+            foreach(var f in config.Formats)
+            {
+                if (f.Enabled)
+                {
+                    if (f.Enabled && format.ToString() != f.Type)
+                    {
+                        iii++;
+                    }
+                    ii2++;
+                }
+            }
+            if (ii2 == iii)
+            {
+                addToFList("Format " + format.ToString() + " is disabled to output.");
+                return -2;
             }
             MusicFileInfo minfo=new MusicFileInfo();
             minfo.Format = format.ToString().ToLower();
@@ -328,10 +353,17 @@ namespace MusicCacheParser
                 song1.Artists[0].Name = song1.Artists[0].Name.Replace(i, '_');
                 song1.Name = song1.Name.Replace(i, '_');
             }
-            var outpath = OutputPath /*+ song1.Artists[0].Name + "\\"*/ + song1.Album.Name + "\\";
+            var outpath = config.SavePath;
+            outpath=outpath.Replace("{album}",song1.Album.Name);
+            outpath=outpath.Replace("{artist}", song1.Artists[0].Name);
+            outpath=outpath.Replace("{title}", song1.Name);
+            
             Directory.CreateDirectory(outpath);
-            var outname = song1.Artists[0].Name + " - " + song1.Name + "." + info.Format;
-            var outfile = outpath + outname;
+            var outname = config.SaveFileName + "." + info.Format;
+            outname = outname.Replace("{album}", song1.Album.Name);
+            outname = outname.Replace("{artist}", song1.Artists[0].Name);
+            outname = outname.Replace("{title}", song1.Name);
+            var outfile = outpath + "\\"+ outname;
             
             if (File.Exists(outfile))
             {
@@ -339,7 +371,7 @@ namespace MusicCacheParser
             }
             var album_pic= wgetBytes(song1.Album.PicUrl);
             var album_pic_nf = tmpPath +"\\"+ Guid.NewGuid().ToString() + ".jpg";
-            var nf = tmpPath + "\\"+Guid.NewGuid().ToString()+ "."+info.Format;
+            var nf = tmpPath+"\\"+Guid.NewGuid().ToString()+ "."+info.Format;
             try
             {
                 var mf = File.Create(nf);

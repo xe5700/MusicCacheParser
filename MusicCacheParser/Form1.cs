@@ -16,24 +16,28 @@ namespace MusicCacheParser
     {
         private MusicParser parser;
         private MusicCacheParserConfig.MusicParserConfig config;
-        private ResourceManager res1;
         public MusicCacheParserConfig.MusicParserConfig Config { get => this.config; }
         public Form1()
         {
+            String conf;
             InitializeComponent();
-            res1 = Resource1.ResourceManager;
             if (!File.Exists("config.json")) {
-                var stream = res1.GetStream("config");
-                
+                conf = UTF8Encoding.UTF8.GetString(Resource1.config);
+                File.WriteAllText("config.json", conf);
             }
-            var conf=File.ReadAllText("config.json");
+            else
+            {
+                conf = File.ReadAllText("config.json"); 
+            }
             config=MusicCacheParserConfig.MusicParserConfig.FromJson(conf);
             parser = new MusicParser(this);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            ConfigForm cf = new ConfigForm(this);
+            cf.Show();
+            this.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -63,6 +67,17 @@ namespace MusicCacheParser
                     }
                 }
             }
+        }
+        public void reload()
+        {
+            parser.end();
+            parser = null;
+            parser = new MusicParser(this);
+        }
+
+        private void statusStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }
