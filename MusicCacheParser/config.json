@@ -1,0 +1,19 @@
+{
+  "neteaseMusic": {
+    "cachePath": "%LocalAppData%\\Netease\\CloudMusic\\Cache",
+    "autoParse": true
+  },
+  "savePath": "music\\{album}",
+  "saveFileName": "{artist} - {title}",
+  "formats": [
+    {
+      "type": "FLAC",
+      "enabled": true
+    },
+    {
+      "type": "MP3",
+      "enabled": false
+    }
+  ],
+  "customTmpPath": ""
+}
