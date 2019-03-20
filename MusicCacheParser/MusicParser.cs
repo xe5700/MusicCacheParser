@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace MusicCacheParser
         private addToList methodAddToList;
         private string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
         //private string outputPath = "Z:\\自动导出\\";
-        private string neteaseCachePath = @"C:\Users\xjbos\AppData\Local\Netease\CloudMusic\Cache\Cache";
+        private string neteaseCachePath = @"%LocalAppData%\\Netease\\CloudMusic\\Cache";
         //public string OutputPath { get => outputPath; set => outputPath = value; }
         public string NeteaseCachePath { get => neteaseCachePath; set => neteaseCachePath = value; }
         private FileSystemWatcher neteaseFSW=new FileSystemWatcher();
@@ -63,9 +63,14 @@ namespace MusicCacheParser
             };
             tmpPath = config.CustomTmpPath != "" ? tmpPath : System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
             Directory.CreateDirectory(tmpPath);
-            if (config.NeteaseMusic.AutoParse) {
-                startAutoParser_netease();
+            try
+            {
+                if (config.NeteaseMusic.AutoParse)
+                {
+                    startAutoParser_netease();
+                }
             }
+            catch (Exception e) { }
             
         }
         public void end()
