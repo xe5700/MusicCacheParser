@@ -43,7 +43,7 @@ namespace MusicCacheParser
         private Form1 form1;
         private ConcurrentDictionary<String,MusicFileInfo> neteaseInfoMap=new ConcurrentDictionary<string, MusicFileInfo>();
         public const byte NETEASE_CODE = 0xA3;
-        public const string NETEASE_DETAIL_INFO = "https://music.163.com/api/song/detail/?ids=%5B{0:G}%5D";
+        public const string NETEASE_DETAIL_INFO = "http://music.163.com/api/song/detail/?ids=%5B{0:G}%5D";
         public const string NETEASE_LRYRIC = "http://music.163.com/api/song/lyric?os=pc&id={0:G}&lv=-1&kv=-1&tv=-1";
         private delegate void addToList(string text);
         private addToList methodAddToList;
@@ -260,23 +260,13 @@ namespace MusicCacheParser
             {
                 return -1;
             }
-            int iii = 0;
-            int ii2 = 0;
             foreach(var f in config.Formats)
             {
-                if (f.Enabled)
+                if (!f.Enabled&&f.Type==format.ToString())
                 {
-                    if (f.Enabled && format.ToString() != f.Type)
-                    {
-                        iii++;
-                    }
-                    ii2++;
+                    addToFList("Format " + format.ToString() + " is disabled to output.");
+                    return -2;
                 }
-            }
-            if (ii2 == iii)
-            {
-                addToFList("Format " + format.ToString() + " is disabled to output.");
-                return -2;
             }
             MusicFileInfo minfo=new MusicFileInfo();
             minfo.Format = format.ToString().ToLower();
@@ -320,11 +310,15 @@ namespace MusicCacheParser
                 neteaseInfoMap.TryAdd(name, minfo);
             }
 
-            if(minfo.Format!= "flac")
-            {
-                return -2;
-            }
 
+            foreach (var f in config.Formats)
+            {
+                if (!f.Enabled && f.Type == minfo.Format.ToString().ToUpper())
+                {
+                    addToFList("Format " + minfo.Format.ToString() + " is disabled to output.");
+                    return -2;
+                }
+            }
             if (minfo.Size != ucsize)
             {
                 addToFList(ucfile + " 's size is wrong.");
