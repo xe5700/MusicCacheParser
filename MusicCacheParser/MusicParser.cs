@@ -157,15 +157,21 @@ namespace MusicCacheParser
             try
             {
                 addToFList(Path.GetFileName(path) + " is detected");
-                Thread.Sleep(120000);
+                Thread.Sleep(60000);
                 while (!canAccess(path))
                 {
-                    Thread.Sleep(60000);
+                    Thread.Sleep(30000);
                 }
-                int ret;
-                while ((ret=tryParseNeteaseF(path))==-3)
+                int ret=-3;
+                while (ret==-3)
                 {
-                    Thread.Sleep(60000);
+                    try
+                    {
+                        ret = tryParseNeteaseF(path);
+                        Thread.Sleep(20000);
+                    }catch(Exception e){
+                        addToFList(e.ToString());
+                    }
                     if (time++ > 10)
                     {
                         addToFList(Path.GetFileName(path) + " is not download complete" + ret);
