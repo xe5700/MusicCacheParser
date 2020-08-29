@@ -39,6 +39,7 @@ namespace MusicCacheParser
             {
                 show_init = false;
             }
+            ThreadPool.SetMaxThreads(10,10);
         }
         protected override void OnShown(EventArgs e)
         {
@@ -60,6 +61,7 @@ namespace MusicCacheParser
 
         private void button1_Click(object sender, EventArgs e)
         {
+            close = true;
             Application.Exit();
         }
 
