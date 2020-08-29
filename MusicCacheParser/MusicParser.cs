@@ -97,13 +97,9 @@ namespace MusicCacheParser
             {
                 Directory.CreateDirectory(tmpPath);
             }
-            Thread t = new Thread(() =>
-              {
-                  doAutoParseNeteaseFile(e.FullPath);
-              });
-            t.Start();
-            //MessageBox.Show(e.FullPath);
-            //var task=doAutoParseNeteaseFile(e.FullPath);
+            ThreadPool.QueueUserWorkItem((run)=> {
+                doAutoParseNeteaseFile(e.FullPath);
+            });
             return;
         }
         private void addToFList(string text)
@@ -155,7 +151,7 @@ namespace MusicCacheParser
             }
             return can;
         }
-        private async Task doAutoParseNeteaseFile(string path)
+        private void doAutoParseNeteaseFile(string path)
         {
             int time = 0;
             try
