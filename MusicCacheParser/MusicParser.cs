@@ -157,10 +157,10 @@ namespace MusicCacheParser
             try
             {
                 addToFList(Path.GetFileName(path) + " is detected");
-                Thread.Sleep(60000);
+                Thread.Sleep(30000);
                 while (!canAccess(path))
                 {
-                    Thread.Sleep(30000);
+                    Thread.Sleep(5000);
                 }
                 int ret=-3;
                 while (ret==-3)
