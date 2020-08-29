@@ -197,7 +197,7 @@ namespace QuickType
         public object[] Songs { get; set; }
 
         [JsonProperty("alias")]
-        public object[] Alias { get; set; }
+        public string[] Alias { get; set; }
 
         [JsonProperty("status")]
         public long Status { get; set; }

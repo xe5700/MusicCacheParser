@@ -30,6 +30,7 @@ namespace MusicCacheParserConfig
 
         [JsonProperty("customTmpPath")]
         public String CustomTmpPath { get; set; }
+
     }
 
     public partial class Format
@@ -48,6 +49,9 @@ namespace MusicCacheParserConfig
 
         [JsonProperty("autoParse")]
         public bool AutoParse { get; set; }
+
+        [JsonProperty("use163Key")]
+        public bool Enable163Key { get; set; } = true;
     }
 
     public partial class MusicParserConfig
@@ -71,4 +75,5 @@ namespace MusicCacheParserConfig
             },
         };
     }
+
 }

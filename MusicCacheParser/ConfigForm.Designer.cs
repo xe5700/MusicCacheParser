@@ -32,16 +32,17 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.neteaseEnable163key = new System.Windows.Forms.CheckBox();
+            this.neteaseAutoParse = new System.Windows.Forms.CheckBox();
             this.neteaseCachePath = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.savePath = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.saveFilename = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tempPath = new System.Windows.Forms.Label();
-            this.neteaseAutoParse = new System.Windows.Forms.CheckBox();
+            this.saveFilename = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.savePath = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -76,6 +77,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.neteaseEnable163key);
             this.groupBox2.Controls.Add(this.neteaseAutoParse);
             this.groupBox2.Controls.Add(this.neteaseCachePath);
             this.groupBox2.Controls.Add(this.label1);
@@ -86,6 +88,33 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "网易云音乐设置";
             // 
+            // neteaseEnable163key
+            // 
+            this.neteaseEnable163key.AutoSize = true;
+            this.neteaseEnable163key.Location = new System.Drawing.Point(114, 47);
+            this.neteaseEnable163key.Name = "neteaseEnable163key";
+            this.neteaseEnable163key.Size = new System.Drawing.Size(84, 16);
+            this.neteaseEnable163key.TabIndex = 7;
+            this.neteaseEnable163key.Text = "添加163KEY";
+            this.neteaseEnable163key.UseVisualStyleBackColor = true;
+            // 
+            // neteaseAutoParse
+            // 
+            this.neteaseAutoParse.AutoSize = true;
+            this.neteaseAutoParse.Location = new System.Drawing.Point(11, 48);
+            this.neteaseAutoParse.Name = "neteaseAutoParse";
+            this.neteaseAutoParse.Size = new System.Drawing.Size(96, 16);
+            this.neteaseAutoParse.TabIndex = 6;
+            this.neteaseAutoParse.Text = "开启自动导出";
+            this.neteaseAutoParse.UseVisualStyleBackColor = true;
+            // 
+            // neteaseCachePath
+            // 
+            this.neteaseCachePath.Location = new System.Drawing.Point(70, 18);
+            this.neteaseCachePath.Name = "neteaseCachePath";
+            this.neteaseCachePath.Size = new System.Drawing.Size(688, 21);
+            this.neteaseCachePath.TabIndex = 1;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -94,13 +123,6 @@
             this.label1.Size = new System.Drawing.Size(53, 12);
             this.label1.TabIndex = 0;
             this.label1.Text = "缓存目录";
-            // 
-            // neteaseCachePath
-            // 
-            this.neteaseCachePath.Location = new System.Drawing.Point(70, 18);
-            this.neteaseCachePath.Name = "neteaseCachePath";
-            this.neteaseCachePath.Size = new System.Drawing.Size(688, 21);
-            this.neteaseCachePath.TabIndex = 1;
             // 
             // groupBox3
             // 
@@ -116,40 +138,6 @@
             this.groupBox3.TabIndex = 3;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "保存设置";
-            // 
-            // savePath
-            // 
-            this.savePath.Location = new System.Drawing.Point(70, 18);
-            this.savePath.Name = "savePath";
-            this.savePath.Size = new System.Drawing.Size(688, 21);
-            this.savePath.TabIndex = 1;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(11, 23);
-            this.label2.Name = "label2";
-            this.label2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.label2.Size = new System.Drawing.Size(53, 12);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "保存目录";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(11, 47);
-            this.label3.Name = "label3";
-            this.label3.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "文件名";
-            // 
-            // saveFilename
-            // 
-            this.saveFilename.Location = new System.Drawing.Point(70, 45);
-            this.saveFilename.Name = "saveFilename";
-            this.saveFilename.Size = new System.Drawing.Size(156, 21);
-            this.saveFilename.TabIndex = 3;
             // 
             // textBox1
             // 
@@ -168,15 +156,39 @@
             this.tempPath.TabIndex = 4;
             this.tempPath.Text = "临时目录";
             // 
-            // neteaseAutoParse
+            // saveFilename
             // 
-            this.neteaseAutoParse.AutoSize = true;
-            this.neteaseAutoParse.Location = new System.Drawing.Point(11, 48);
-            this.neteaseAutoParse.Name = "neteaseAutoParse";
-            this.neteaseAutoParse.Size = new System.Drawing.Size(96, 16);
-            this.neteaseAutoParse.TabIndex = 6;
-            this.neteaseAutoParse.Text = "开启自动导出";
-            this.neteaseAutoParse.UseVisualStyleBackColor = true;
+            this.saveFilename.Location = new System.Drawing.Point(70, 45);
+            this.saveFilename.Name = "saveFilename";
+            this.saveFilename.Size = new System.Drawing.Size(156, 21);
+            this.saveFilename.TabIndex = 3;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(11, 47);
+            this.label3.Name = "label3";
+            this.label3.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "文件名";
+            // 
+            // savePath
+            // 
+            this.savePath.Location = new System.Drawing.Point(70, 18);
+            this.savePath.Name = "savePath";
+            this.savePath.Size = new System.Drawing.Size(688, 21);
+            this.savePath.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(11, 23);
+            this.label2.Name = "label2";
+            this.label2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.label2.Size = new System.Drawing.Size(53, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "保存目录";
             // 
             // ConfigForm
             // 
@@ -217,5 +229,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label tempPath;
         private System.Windows.Forms.CheckBox neteaseAutoParse;
+        private System.Windows.Forms.CheckBox neteaseEnable163key;
     }
 }

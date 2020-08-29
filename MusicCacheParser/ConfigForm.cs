@@ -34,6 +34,7 @@ namespace MusicCacheParser
             saveFilename.Text = config.SaveFileName;
             neteaseAutoParse.Checked = config.NeteaseMusic.AutoParse;
             neteaseCachePath.Text = config.NeteaseMusic.CachePath;
+            neteaseEnable163key.Checked = config.NeteaseMusic.Enable163Key;
         }
         private void addFormat(String format,bool v)
         {
@@ -72,6 +73,7 @@ namespace MusicCacheParser
             config.SaveFileName = saveFilename.Text;
             config.NeteaseMusic.AutoParse = neteaseAutoParse.Checked;
             config.NeteaseMusic.CachePath = neteaseCachePath.Text;
+            config.NeteaseMusic.Enable163Key = neteaseEnable163key.Checked;
             File.WriteAllText("config.json", MusicCacheParserConfig.Serialize.ToJson(config));
             f1.reload();
             f1.Enabled = true;

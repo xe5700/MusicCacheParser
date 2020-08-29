@@ -1,7 +1,11 @@
+using MusicCacheParser.MetaJson;
 using Newtonsoft.Json.Linq;
+using QuickType;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,6 +13,7 @@ using System.Net.Http;
 using System.Runtime.Remoting;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,15 +26,29 @@ namespace MusicCacheParser
         private double volume;
         private int size;
         private String id;
-
+        private int bitrate;
+        private string md5;
         public string Format { get => format; set => format = value; }
         public double Volume { get => volume; set => volume = value; }
         public int Size { get => size; set => size = value; }
         public string Id { get => id; set => id = value; }
+        public int Bitrate { get => bitrate; set => bitrate = value; }
+        public string Md5 { get => md5; set => md5 = value; }
     }
-    class MusicInf
+
+    class Utils
     {
-        
+       public static byte[] Hex2Binary(string hex)
+        {
+            var chars = hex.ToCharArray();
+            var bytes = new List<byte>();
+            for (int index = 0; index < chars.Length; index += 2)
+            {
+                var chunk = new string(chars, index, 2);
+                bytes.Add(byte.Parse(chunk, NumberStyles.AllowHexSpecifier));
+            }
+            return bytes.ToArray();
+        }
     }
     class MusicParser
     {
@@ -45,22 +64,15 @@ namespace MusicCacheParser
         public const byte NETEASE_CODE = 0xA3;
         public const string NETEASE_DETAIL_INFO = "http://music.163.com/api/song/detail/?ids=%5B{0:G}%5D";
         public const string NETEASE_LRYRIC = "http://music.163.com/api/song/lyric?os=pc&id={0:G}&lv=-1&kv=-1&tv=-1";
-        private delegate void addToList(string text);
-        private addToList methodAddToList;
         private string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
-        //private string outputPath = "Z:\\自动导出\\";
         private string neteaseCachePath = @"%LocalAppData%\\Netease\\CloudMusic\\Cache";
-        //public string OutputPath { get => outputPath; set => outputPath = value; }
+        private byte[] encrypt163key = Utils.Hex2Binary("2331346C6A6B5F215C5D2630553C2728");
         public string NeteaseCachePath { get => neteaseCachePath; set => neteaseCachePath = value; }
         private FileSystemWatcher neteaseFSW=new FileSystemWatcher();
         private void init()
         {
             config = form1.Config;
             NeteaseCachePath = System.Environment.ExpandEnvironmentVariables(config.NeteaseMusic.CachePath+"\\Cache");
-            methodAddToList = t =>
-            {
-                form1.ListBox1.Items.Add(t);
-            };
             tmpPath = config.CustomTmpPath != "" ? tmpPath : System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".tmp";
             Directory.CreateDirectory(tmpPath);
             try
@@ -102,12 +114,6 @@ namespace MusicCacheParser
             });
             return;
         }
-        private void addToFList(string text)
-        {
-
-            form1.Invoke(methodAddToList, text);
-            //form1.ListBox1.ref
-        }
         private byte[] wgetBytes(String url)
         {
             try
@@ -119,7 +125,7 @@ namespace MusicCacheParser
             catch (Exception e)
             {
 
-                addToFList(e.ToString());
+                form1.addToFList(e.ToString());
             }
             return null;
         }
@@ -156,7 +162,7 @@ namespace MusicCacheParser
             int time = 0;
             try
             {
-                addToFList(Path.GetFileName(path) + " is detected");
+                form1.addToFList(Path.GetFileName(path) + " is detected");
                 Thread.Sleep(30000);
                 while (!canAccess(path))
                 {
@@ -170,23 +176,19 @@ namespace MusicCacheParser
                         ret = tryParseNeteaseF(path);
                         Thread.Sleep(20000);
                     }catch(Exception e){
-                        addToFList(e.ToString());
+                        form1.addToFList(e.ToString());
                     }
                     if (time++ > 10)
                     {
-                        addToFList(Path.GetFileName(path) + " is not download complete" + ret);
+                        form1.addToFList(Path.GetFileName(path) + " is not download complete" + ret);
                         return;
                     }
                 }
-                addToFList(Path.GetFileName(path) + "'s result is " + ret);
+                form1.addToFList(Path.GetFileName(path) + "'s result is " + ret);
             }catch(Exception e)
             {
-                addToFList(e.ToString());
+                form1.addToFList(e.ToString());
             }
-        }
-        public bool tryParseNeteaseFile(string path)
-        {
-            return tryParseNeteaseFile(path, 0)<0?false:true;
         }
         private string getNeteaseFileMD5(FileStream fs)
         {
@@ -266,7 +268,7 @@ namespace MusicCacheParser
             {
                 if (!f.Enabled&&f.Type==format.ToString())
                 {
-                    addToFList("Format " + format.ToString() + " is disabled to output.");
+                    form1.addToFList("Format " + format.ToString() + " is disabled to output.");
                     return -2;
                 }
             }
@@ -275,61 +277,58 @@ namespace MusicCacheParser
             minfo.Size = 0;
             minfo.Volume = 0;
             minfo.Id= names[0]; ;
-            addToFList("Found "+format.ToString()+" "+name);
+            minfo.Bitrate = int.Parse(names[1]);
+            minfo.Md5 = hash;
+            form1.addToFList("Found "+format.ToString()+" "+name);
             ParseNeteaseFile(path, minfo);
             //MessageBox.Show(format.ToString());
             return 1;
         }
-        public int tryParseNeteaseFile(string path, long ucsize)
+        private static readonly Regex findPicId = new Regex(@"/(\d+)\.\w+$");
+        private String mk163Key(MusicFileInfo fileinfo, NeteaseMusicDetails details)
         {
-            var ucfile = path + ".uc";
-            var idxfile = path + ".idx";
-            var infofile = path + ".info";
-            if (!(File.Exists(ucfile) && File.Exists(idxfile) && File.Exists(infofile)))
+            var song = details.Songs[0];
+            var album = song.Album;
+            var artists = song.Artists.Select(i => new string[] { i.Name, i.Id.ToString() }).ToArray();
+            string picid;
+            if(album.Pic == 0)
             {
-                //addToFList(path + " ");
-                return -1;
+                picid = findPicId.Match(album.PicUrl).Groups[1].Value;
             }
-            var name = Path.GetFileName(path);
-            if (ucsize == 0) {
-                var ucattr = new FileInfo(path + ".uc");
-                ucsize = (int)ucattr.Length;
-            }
-            MusicFileInfo minfo;
-            if (neteaseInfoMap.ContainsKey(name))
+            else
             {
-                minfo = neteaseInfoMap[name];
-            }else{
-                var idxinfo=File.ReadAllText(path + ".idx");
-                var idx=QuickType.NeteaseIDX.FromJson(idxinfo);
-                var infojson = File.ReadAllText(path + ".info");
-                var info = QuickType.NeteaseInfoSerialize.FromJson(infojson);
-                minfo = new MusicFileInfo();
-                minfo.Format = info.Format;
-                minfo.Volume = info.Volume;
-                minfo.Size = (int)idx.Size;
-                minfo.Id = name.Split('-')[0];
-                neteaseInfoMap.TryAdd(name, minfo);
+                picid = album.Pic.ToString();
             }
-
-
-            foreach (var f in config.Formats)
+            NeteaseMeta meta = new NeteaseMeta {
+                Artist = artists,
+                Album = album.Name,
+                AlbumId = album.Id,
+                AlbumPic = album.PicUrl,
+                AlbumPicDocId = picid,
+                Alias = album.Alias == null ? new string[0] : album.Alias,
+                MusicId = song.Id,
+                MusicName = song.Name,
+                MvId = song.Mvid,
+                TransNames = new string[0],
+                Format = fileinfo.Format,
+                Bitrate = fileinfo.Bitrate * 1000,
+                Duration = song.Duration,
+                Mp3DocId = fileinfo.Md5
+            };
+            var comment = "music:" + meta.ToJson();
             {
-                if (!f.Enabled && f.Type == minfo.Format.ToString().ToUpper())
-                {
-                    addToFList("Format " + minfo.Format.ToString() + " is disabled to output.");
-                    return -2;
-                }
+                var aes = new AesCryptoServiceProvider();
+                aes.Mode = CipherMode.ECB;
+                //aes.Padding = PaddingMode.PKCS7;
+                //aes.BlockSize = 8;
+                var enc = aes.CreateEncryptor();
+                var bytes = Encoding.UTF8.GetBytes(comment);
+                bytes = Padding.PKCS7.Encoding(bytes, 8);
+                bytes = enc.TransformFinalBlock(bytes,0,bytes.Length);
+                comment = "163 key(Don\'t modify):"+ Convert.ToBase64String(bytes);
+                
             }
-            if (minfo.Size != ucsize)
-            {
-                addToFList(ucfile + " 's size is wrong.");
-                return -1;
-            }
-            
-            ParseNeteaseFile(ucfile, minfo);
-            //Messagebox(Path.GetFileName(path));
-            return 0;
+            return comment;
         }
         private void ParseNeteaseFile(string path,MusicFileInfo info)
         {
@@ -412,20 +411,24 @@ namespace MusicCacheParser
                         tag.Disc = (uint)disc;
                     }
                 }
-                var arts = new String[song1.Artists.Length];
-                var a = 0;
-                foreach (var i in song1.Artists)
-                {
-                    arts[a++] = i.Name;
-                }
+                var arts = song1.Artists.Select(i => i.Name).ToArray();
                 tag.AlbumArtists = arts;
+
+                //开始构建163Key
+                if (config.NeteaseMusic.Enable163Key)
+                {
+                    var key163 = mk163Key(info, songDetail);
+                    tag.Description = key163;
+                    tag.Comment = key163;
+                }
+                //结束构建163Key
                 tagf.Save();
                 if (!File.Exists(outfile))
                 {
-                    addToFList("Try move to " + outfile);
+                    form1.addToFList("Try move to " + outfile);
                     File.Move(nf, outfile);
                 }
-                addToFList(Path.GetFileName(path) + " is parsed to " + Path.GetFileName(outfile));
+                form1.addToFList(Path.GetFileName(path) + " is parsed to " + Path.GetFileName(outfile));
             }
             finally
             {

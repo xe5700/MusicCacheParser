@@ -20,6 +20,13 @@ namespace MusicCacheParser
         public MusicCacheParserConfig.MusicParserConfig Config { get => this.config; }
         private string[] args;
         private bool show_init = true;
+        private delegate void addToList(string text);
+        private addToList methodAddToList;
+        public void addToFList(string text)
+        {
+            Invoke(methodAddToList, text);
+            //form1.ListBox1.ref
+        }
         public Form1(string[] args)
         {
             String conf;
@@ -40,6 +47,10 @@ namespace MusicCacheParser
                 show_init = false;
             }
             ThreadPool.SetMaxThreads(10,10);
+            methodAddToList = t =>
+            {
+                ListBox1.Items.Add(t);
+            };
         }
         protected override void OnShown(EventArgs e)
         {
@@ -88,12 +99,12 @@ namespace MusicCacheParser
                             {
                                 try
                                 {
-                                    var nf = Path.GetDirectoryName(f) + "\\" + Path.GetFileNameWithoutExtension(f);
-                                    parser.tryParseNeteaseFile(nf);
+                                    parser.tryParseNeteaseF(f);
                                 }
                                 catch (Exception err)
                                 {
-                                    listBox1.Items.Add(err.ToString());
+
+                                    addToFList(err.ToString());
                                 }
                             }
                         }
