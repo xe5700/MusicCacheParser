@@ -39,8 +39,8 @@ namespace MusicCacheParser
             this.button3 = new System.Windows.Forms.Button();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.退出QToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.导出全部缓存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.退出QToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,19 +108,19 @@ namespace MusicCacheParser
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(149, 48);
             // 
-            // 退出QToolStripMenuItem
-            // 
-            this.退出QToolStripMenuItem.Name = "退出QToolStripMenuItem";
-            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.退出QToolStripMenuItem.Text = "退出 (&Q)";
-            this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
-            // 
             // 导出全部缓存ToolStripMenuItem
             // 
             this.导出全部缓存ToolStripMenuItem.Name = "导出全部缓存ToolStripMenuItem";
             this.导出全部缓存ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.导出全部缓存ToolStripMenuItem.Text = "导出全部缓存";
             this.导出全部缓存ToolStripMenuItem.Click += new System.EventHandler(this.导出全部缓存ToolStripMenuItem_Click);
+            // 
+            // 退出QToolStripMenuItem
+            // 
+            this.退出QToolStripMenuItem.Name = "退出QToolStripMenuItem";
+            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.退出QToolStripMenuItem.Text = "退出 (&Q)";
+            this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
             // 
             // Form1
             // 

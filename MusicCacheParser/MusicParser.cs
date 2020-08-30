@@ -58,7 +58,9 @@ namespace MusicCacheParser
             init();
         }
         private MusicCacheParserConfig.MusicParserConfig config;
-        private static readonly HttpClient client = new HttpClient();
+        private static readonly HttpClient client = new HttpClient(new HttpClientHandler() {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        });
         private Form1 form1;
         private ConcurrentDictionary<String,MusicFileInfo> neteaseInfoMap=new ConcurrentDictionary<string, MusicFileInfo>();
         public const byte NETEASE_CODE = 0xA3;

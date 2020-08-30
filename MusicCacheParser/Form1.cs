@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace MusicCacheParser
         public void addToFList(string text)
         {
             Invoke(methodAddToList, text);
+            Debug.WriteLine(text);
             //form1.ListBox1.ref
         }
         public Form1(string[] args)
