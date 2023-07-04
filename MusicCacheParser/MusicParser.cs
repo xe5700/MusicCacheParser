@@ -58,11 +58,12 @@ namespace MusicCacheParser
             init();
         }
         private MusicCacheParserConfig.MusicParserConfig config;
-        private static readonly HttpClient client = new HttpClient(new HttpClientHandler() {
-            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        private static readonly HttpClient client = new HttpClient(new HttpClientHandler()
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
         });
         private Form1 form1;
-        private ConcurrentDictionary<String,MusicFileInfo> neteaseInfoMap=new ConcurrentDictionary<string, MusicFileInfo>();
+        private ConcurrentDictionary<String, MusicFileInfo> neteaseInfoMap = new ConcurrentDictionary<string, MusicFileInfo>();
         public const byte NETEASE_CODE = 0xA3;
         public const string NETEASE_DETAIL_INFO = "http://music.163.com/api/song/detail/?ids=%5B{0:G}%5D";
         public const string NETEASE_LRYRIC = "http://music.163.com/api/song/lyric?os=pc&id={0:G}&lv=-1&kv=-1&tv=-1";
@@ -70,7 +71,11 @@ namespace MusicCacheParser
         private string neteaseCachePath = @"%LocalAppData%\\Netease\\CloudMusic\\Cache";
         private byte[] encrypt163key = Utils.Hex2Binary("2331346C6A6B5F215C5D2630553C2728");
         public string NeteaseCachePath { get => neteaseCachePath; set => neteaseCachePath = value; }
-        private FileSystemWatcher neteaseFSW=new FileSystemWatcher();
+        private FileSystemWatcher neteaseFSW = new FileSystemWatcher();
+        static MusicParser(){
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36");
+            client.DefaultRequestHeaders.Add("X-Real-IP", "59.111.181.60");
+        }
         private void init()
         {
             config = form1.Config;
@@ -179,11 +184,6 @@ namespace MusicCacheParser
                         Thread.Sleep(20000);
                     }catch(Exception e){
                         form1.addToFList(e.ToString());
-                    }
-                    if (time++ > 10)
-                    {
-                        form1.addToFList(Path.GetFileName(path) + " is not download complete" + ret);
-                        return;
                     }
                 }
                 form1.addToFList(Path.GetFileName(path) + "'s result is " + ret);
@@ -415,12 +415,12 @@ namespace MusicCacheParser
                 }
                 var arts = song1.Artists.Select(i => i.Name).ToArray();
                 tag.AlbumArtists = arts;
-
+                tag.Performers = arts;
                 //开始构建163Key
                 if (config.NeteaseMusic.Enable163Key)
                 {
                     var key163 = mk163Key(info, songDetail);
-                    tag.Description = key163;
+                    //tag.Description = key163;
                     tag.Comment = key163;
                 }
                 //结束构建163Key
